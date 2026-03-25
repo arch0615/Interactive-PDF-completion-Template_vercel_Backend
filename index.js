@@ -7,7 +7,6 @@ import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -21,7 +20,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
 }));
 
-// Explicitly handle preflight requests
 app.options('*', cors({
   origin: allowedOrigins,
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -30,28 +28,22 @@ app.options('*', cors({
 
 app.use(express.json({ limit: '10mb' }));
 
-// Ensure output directory exists
-// On Vercel /var/task is read-only, so use /tmp
-const defaultOutputDir = join(__dirname, 'output');
-let outputDir;
-try {
-  if (!fs.existsSync(defaultOutputDir)) {
-    fs.mkdirSync(defaultOutputDir, { recursive: true });
-  }
-  outputDir = defaultOutputDir;
-} catch {
-  outputDir = '/tmp/output';
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
-  }
+// Use /tmp on Vercel (read-only filesystem), local output dir otherwise
+const isVercel = !!process.env.VERCEL;
+export const outputDir = isVercel
+  ? '/tmp/output'
+  : join(__dirname, 'output');
+
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true });
 }
 
 app.use('/api/pdf', pdfRouter);
 
-// For local development
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+if (!isVercel) {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
 
-// For Vercel serverless
 export default app;
