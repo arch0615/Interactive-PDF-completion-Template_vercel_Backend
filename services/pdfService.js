@@ -1,4 +1,5 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
 import fs from 'fs';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,9 +10,16 @@ let browser = null;
 
 async function getBrowser() {
   if (!browser || !browser.connected) {
+    const isVercel = !!process.env.VERCEL;
     browser = await puppeteer.launch({
+      args: isVercel
+        ? chromium.args
+        : ['--no-sandbox', '--disable-setuid-sandbox'],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: isVercel
+        ? await chromium.executablePath()
+        : (process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable'),
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
   }
   return browser;

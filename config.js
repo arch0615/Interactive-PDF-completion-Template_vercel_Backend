@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 // Coordinates calibrated from grid overlay
 
 export const config = {
-  templatePath: join(__dirname, '..', '3a3de12b-352c-43a1-9527-2007b2948259.pdf'),
+  templatePath: join(__dirname, '3a3de12b-352c-43a1-9527-2007b2948259.pdf'),
   outputDir: join(__dirname, 'output'),
 
   fields: {
