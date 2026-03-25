@@ -30,8 +30,8 @@ app.options('*', cors({
 
 app.use(express.json({ limit: '10mb' }));
 
-// Ensure output directory exists
-const outputDir = join(__dirname, 'output');
+// Ensure output directory exists (use /tmp on Vercel as filesystem is read-only)
+const outputDir = process.env.VERCEL ? '/tmp/output' : join(__dirname, 'output');
 if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true });
 }
