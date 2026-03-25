@@ -1,8 +1,21 @@
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+function getOutputDir() {
+  const local = join(__dirname, 'output');
+  try {
+    if (!fs.existsSync(local)) fs.mkdirSync(local, { recursive: true });
+    return local;
+  } catch {
+    const tmp = '/tmp/output';
+    if (!fs.existsSync(tmp)) fs.mkdirSync(tmp, { recursive: true });
+    return tmp;
+  }
+}
 
 // PDF page size: 594.96 x 841.92 points (A4)
 // Coordinate origin: bottom-left
@@ -10,7 +23,7 @@ const __dirname = dirname(__filename);
 
 export const config = {
   templatePath: join(__dirname, '3a3de12b-352c-43a1-9527-2007b2948259.pdf'),
-  outputDir: process.env.VERCEL ? '/tmp/output' : join(__dirname, 'output'),
+  outputDir: getOutputDir(),
 
   fields: {
     // ===================== PAGE 1 =====================

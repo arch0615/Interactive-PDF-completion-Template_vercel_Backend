@@ -30,10 +30,20 @@ app.options('*', cors({
 
 app.use(express.json({ limit: '10mb' }));
 
-// Ensure output directory exists (use /tmp on Vercel as filesystem is read-only)
-const outputDir = process.env.VERCEL ? '/tmp/output' : join(__dirname, 'output');
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir, { recursive: true });
+// Ensure output directory exists
+// On Vercel /var/task is read-only, so use /tmp
+const defaultOutputDir = join(__dirname, 'output');
+let outputDir;
+try {
+  if (!fs.existsSync(defaultOutputDir)) {
+    fs.mkdirSync(defaultOutputDir, { recursive: true });
+  }
+  outputDir = defaultOutputDir;
+} catch {
+  outputDir = '/tmp/output';
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
 }
 
 app.use('/api/pdf', pdfRouter);
