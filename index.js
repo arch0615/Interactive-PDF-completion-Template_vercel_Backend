@@ -28,6 +28,11 @@ if (!fs.existsSync(outputDir)) {
 
 app.use('/api/pdf', pdfRouter);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+if (process.env.VERCEL) {
+  // Export for Vercel serverless
+  export default app;
+} else {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
