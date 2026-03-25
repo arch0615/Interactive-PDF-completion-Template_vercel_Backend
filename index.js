@@ -17,7 +17,17 @@ const allowedOrigins = process.env.CLIENT_URL
 
 app.use(cors({
   origin: allowedOrigins,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
 }));
+
+// Explicitly handle preflight requests
+app.options('*', cors({
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+}));
+
 app.use(express.json({ limit: '10mb' }));
 
 // Ensure output directory exists
@@ -28,11 +38,10 @@ if (!fs.existsSync(outputDir)) {
 
 app.use('/api/pdf', pdfRouter);
 
-if (process.env.VERCEL) {
-  // Export for Vercel serverless
-  export default app;
-} else {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+// For local development
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+// For Vercel serverless
+export default app;
