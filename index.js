@@ -9,9 +9,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',')
+  : ['http://localhost:5174'];
+
+app.use(cors({
+  origin: allowedOrigins,
+}));
 app.use(express.json({ limit: '10mb' }));
 
 // Ensure output directory exists
